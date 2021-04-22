@@ -13,7 +13,7 @@
     "version": {
         "Major": "2",
         "Minor": "3",
-        "Patch": "782"
+        "Patch": "806"
     },
     "demands": [],
     "minimumAgentVersion": "1.91.0",
@@ -29,7 +29,8 @@
             "helpMarkDown": "The source of the workitems to update.",
             "options": {
                 "Build": "WorkItems linked to the Build/Release",
-                "Query": "Query"
+                "Query": "Query",
+                "PR": "PR"
             }
         },
         {

@@ -1,12 +1,15 @@
 {
     "manifestVersion": 1,
-    "id": "bluebasher-workitemupdater",
-    "version": "2.3.765",
-    "name": "WorkItem Updater",
-    "scopes": [ "vso.work", "vso.work_write" ],
+    "id": "bluebasher-workitemupdater-nztg",
+    "version": "2.3.807",
+    "name": "WorkItem Updater NZTG",
+    "scopes": [
+        "vso.work",
+        "vso.work_write"
+    ],
     "description": "Update the state of work items linked to a build.",
     "baseUri": "https://localhost",
-    "publisher": "BlueBasher",
+    "publisher": "NZTGDev",
     "public": false,
     "icons": {
         "default": "img/logo.png"
@@ -49,7 +52,6 @@
     },
     "files": [
         {
-
             "path": "img",
             "addressable": true
         },
@@ -58,7 +60,7 @@
         }
     ],
     "categories": [
-        "Build and release"
+        "Azure Pipelines"
     ],
     "contributions": [
         {

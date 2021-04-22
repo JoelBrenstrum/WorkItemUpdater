@@ -12,6 +12,7 @@ import { WorkItemExpand, WorkItem, WorkItemField, WorkItemRelation, QueryHierarc
 import { WorkItemQueryResult } from 'azure-devops-node-api/interfaces/WorkItemTrackingInterfaces';
 import { IReleaseApi } from 'azure-devops-node-api/ReleaseApi';
 import { DeploymentStatus, ReleaseQueryOrder } from 'azure-devops-node-api/interfaces/ReleaseInterfaces';
+import { IGitApi } from 'azure-devops-node-api/GitApi';
 
 async function main(): Promise<void> {
     try {
@@ -93,8 +94,10 @@ function getVstsWebApi() {
 function getSettings(): Settings {
     const settings = new Settings();
     settings.buildId = parseInt(tl.getVariable('Build.BuildId'));
+    settings.pullRequestId = parseInt(tl.getVariable('System.PullRequest.PullRequestId'));
     settings.projectId = tl.getVariable('System.TeamProjectId');
     settings.requestedFor = tl.getVariable('Build.RequestedFor');
+    settings.repositoryId = tl.getVariable('Build.Repository.ID');
     settings.workitemsSource = tl.getInput('workitemsSource');
     settings.workitemsSourceQuery = tl.getInput('workitemsSourceQuery');
     settings.allWorkItemsSinceLastRelease = tl.getBoolInput('allWorkItemsSinceLastRelease');
@@ -136,6 +139,8 @@ function getSettings(): Settings {
 
     tl.debug('BuildId ' + settings.buildId);
     tl.debug('ProjectId ' + settings.projectId);
+    tl.debug('RepositoryId ' + settings.repositoryId);
+    tl.debug('PullRequestId ' + settings.pullRequestId);
     tl.debug('ReleaseId ' + settings.releaseId);
     tl.debug('DefinitionId ' + settings.definitionId);
     tl.debug('DefinitionEnvironmentId ' + settings.definitionEnvironmentId);
@@ -214,6 +219,15 @@ async function getWorkItemsRefs(vstsWebApi: WebApi, workItemTrackingClient: IWor
             tl.warning('Could not find query ' + settings.workitemsSourceQuery);
         }
         return result;
+    }
+    else if (settings.workitemsSource === 'PR') {
+        console.log('Using PR as WorkItem Source');
+        const gitClient: IGitApi = await vstsWebApi.getGitApi();
+        if (!settings.pullRequestId) {
+            tl.warning('Pull request unavailable');
+        }
+        const workItemRefs: ResourceRef[] = await gitClient.getPullRequestWorkItemRefs(settings.repositoryId, settings.pullRequestId)
+        return workItemRefs;
     }
 
     return undefined;
@@ -334,7 +348,7 @@ async function updateWorkItem(workItemTrackingClient: IWorkItemTrackingApi, work
                             }
                         }
                     }
-                    console.log('Updating' + fieldName + ' to ' + fieldValue);
+                    console.log('Updating ' + fieldName + ' to ' + fieldValue);
                     addPatchOperation('/fields/' + fieldName, fieldValue, document);
                 }
             });
@@ -350,11 +364,12 @@ async function updateWorkItem(workItemTrackingClient: IWorkItemTrackingApi, work
         }
 
         if (document.length > 0) {
+            tl.debug(`document contents: ${JSON.stringify(document)}`);
             const updatedWorkItem = await workItemTrackingClient.updateWorkItem(
                 undefined,
                 document,
                 workItem.id,
-                undefined,
+                settings.projectId,
                 settings.bypassRules);
             console.log('WorkItem ' + workItem.id + ' updated');
         }

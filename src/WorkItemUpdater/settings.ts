@@ -1,6 +1,8 @@
 export class Settings {
     public buildId: number;
+    public pullRequestId: number;
     public projectId: string;
+    public repositoryId: string;
     public releaseId: number | null;
     public definitionId: number | null;
     public definitionEnvironmentId: number | null;
