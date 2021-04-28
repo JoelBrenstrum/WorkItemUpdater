@@ -65,6 +65,37 @@ async function main(): Promise<void> {
             tl.debug('Finished loop workItemsRefs');
         }
 
+
+
+        if (settings.pullRequestId) {
+            const gitClient: IGitApi = await vstsWebApi.getGitApi();
+            if (settings.addPRTags || settings.removePRTags) {
+                const existingAdds: string[] = [];
+                const existingLabels = await gitClient.getPullRequestLabels(settings.repositoryId, settings.pullRequestId)
+
+                const removeTags: string[] = settings.removeTags ? settings.removeTags.split(';') : [];
+                if (existingLabels.length > 0) {
+                    tl.debug('Existing tags: ' + existingLabels.map(e => e.name));
+                    existingLabels.forEach((label) => {
+                        if (removeTags.find(e => e.toLowerCase() === label.name.trim().toLowerCase())) {
+                            console.log('Removing tag: ' + label.name + ' from PR');
+                            gitClient.deletePullRequestLabels(settings.repositoryId, settings.pullRequestId, label.id);
+                        }
+                        else {
+                            existingAdds.push(label.name);
+                        }
+                    });
+                }
+
+                const addTags: string[] = settings.addTags ? settings.addTags.split(';') : [];
+                addTags.forEach((tag) => {
+                    if (!existingAdds.find(e => e.toLowerCase() === tag.toLowerCase())) {
+                        console.log('Adding tag: ' + tag + ' to PR');
+                        gitClient.createPullRequestLabel({ name: tag }, settings.repositoryId, settings.pullRequestId);
+                    }
+                });
+            }
+        }
         if (numberOfUpdateWorkitems == 0
             && settings.failTaskIfNoWorkItemsAvailable) {
             tl.setResult(tl.TaskResult.Failed, 'Found no workitems to update.');
@@ -126,6 +157,15 @@ function getSettings(): Settings {
         settings.removeTags = settings.removeTags.replace(/(?:\r\n|\r|\n)/g, ';');
     }
 
+    settings.addPRTags = tl.getInput('addPRTags');
+    if (settings.addPRTags) {
+        settings.addPRTags = settings.addPRTags.replace(/(?:\r\n|\r|\n)/g, ';');
+    }
+    settings.removePRTags = tl.getInput('removePRTags');
+    if (settings.removePRTags) {
+        settings.removePRTags = settings.removePRTags.replace(/(?:\r\n|\r|\n)/g, ';');
+    }
+
     const releaseIdString = tl.getVariable('Release.ReleaseId');
     const definitionIdString = tl.getVariable('Release.DefinitionId');
     const definitionEnvironmentIdString = tl.getVariable('Release.DefinitionEnvironmentId');
@@ -162,6 +202,8 @@ function getSettings(): Settings {
     tl.debug('updateFields ' + settings.updateFields);
     tl.debug('comment ' + settings.comment);
     tl.debug('removeTags ' + settings.removeTags);
+    tl.debug('addPRTags ' + settings.addPRTags);
+    tl.debug('removePRTags ' + settings.removePRTags);
     tl.debug('bypassRules ' + settings.bypassRules);
     tl.debug('failTaskIfNoWorkItemsAvailable ' + settings.failTaskIfNoWorkItemsAvailable);
 
@@ -225,6 +267,7 @@ async function getWorkItemsRefs(vstsWebApi: WebApi, workItemTrackingClient: IWor
         const gitClient: IGitApi = await vstsWebApi.getGitApi();
         if (!settings.pullRequestId) {
             tl.warning('Pull request unavailable');
+            return undefined;
         }
         const workItemRefs: ResourceRef[] = await gitClient.getPullRequestWorkItemRefs(settings.repositoryId, settings.pullRequestId)
         return workItemRefs;

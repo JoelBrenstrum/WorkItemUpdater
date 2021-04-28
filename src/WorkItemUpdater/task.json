@@ -13,7 +13,7 @@
     "version": {
         "Major": "2",
         "Minor": "3",
-        "Patch": "806"
+        "Patch": "811"
     },
     "demands": [],
     "minimumAgentVersion": "1.91.0",
@@ -240,6 +240,34 @@
                 "maxLength": "5000"
             },
             "helpMarkDown": "Tags to remove from the workitem. Enter a tag per line."
+        },
+        {
+            "name": "addPRTags",
+            "type": "multiLine",
+            "label": "Tags to add to the PR",
+            "required": false,
+            "defaultValue": "",
+            "visibleRule": "workitemsSource == PR",
+            "properties": {
+                "resizable": "true",
+                "rows": "4",
+                "maxLength": "5000"
+            },
+            "helpMarkDown": "Tags to assign to the pullrequest. Enter a tag per line."
+        },
+        {
+            "name": "removePRTags",
+            "type": "multiLine",
+            "label": "Tags to remove from the PR",
+            "required": false,
+            "defaultValue": "",
+            "visibleRule": "workitemsSource == PR",
+            "properties": {
+                "resizable": "true",
+                "rows": "4",
+                "maxLength": "5000"
+            },
+            "helpMarkDown": "Tags to remove from the pullrequest. Enter a tag per line."
         }
     ],
     "sourceDefinitions": [

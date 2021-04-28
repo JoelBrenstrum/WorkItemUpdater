@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "bluebasher-workitemupdater-nztg",
-    "version": "2.3.807",
+    "version": "2.3.811",
     "name": "WorkItem Updater NZTG",
     "scopes": [
         "vso.work",

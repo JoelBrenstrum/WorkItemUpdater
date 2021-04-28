@@ -21,6 +21,8 @@ export class Settings {
     public updateAssignedTo: string;
     public updateAssignedToWith: string;
     public assignedTo: string;
+    public addPRTags: string;
+    public removePRTags: string;
     public addTags: string;
     public removeTags: string;
     public comment: string;
