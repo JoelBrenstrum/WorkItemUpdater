@@ -73,7 +73,7 @@ async function main(): Promise<void> {
                 const existingAdds: string[] = [];
                 const existingLabels = await gitClient.getPullRequestLabels(settings.repositoryId, settings.pullRequestId)
 
-                const removeTags: string[] = settings.removeTags ? settings.removeTags.split(';') : [];
+                const removeTags: string[] = settings.removePRTags ? settings.removePRTags.split(';') : [];
                 if (existingLabels.length > 0) {
                     tl.debug('Existing tags: ' + existingLabels.map(e => e.name));
                     existingLabels.forEach((label) => {
@@ -87,7 +87,7 @@ async function main(): Promise<void> {
                     });
                 }
 
-                const addTags: string[] = settings.addTags ? settings.addTags.split(';') : [];
+                const addTags: string[] = settings.addPRTags ? settings.addPRTags.split(';') : [];
                 addTags.forEach((tag) => {
                     if (!existingAdds.find(e => e.toLowerCase() === tag.toLowerCase())) {
                         console.log('Adding tag: ' + tag + ' to PR');
@@ -177,36 +177,38 @@ function getSettings(): Settings {
         settings.definitionEnvironmentId = parseInt(definitionEnvironmentIdString);
     }
 
-    tl.debug('BuildId ' + settings.buildId);
-    tl.debug('ProjectId ' + settings.projectId);
-    tl.debug('RepositoryId ' + settings.repositoryId);
-    tl.debug('PullRequestId ' + settings.pullRequestId);
-    tl.debug('ReleaseId ' + settings.releaseId);
-    tl.debug('DefinitionId ' + settings.definitionId);
-    tl.debug('DefinitionEnvironmentId ' + settings.definitionEnvironmentId);
-    tl.debug('requestedFor ' + settings.requestedFor);
-    tl.debug('workitemsSource ' + settings.workitemsSource);
-    tl.debug('workitemLimit ' + settings.workitemLimit);
-    tl.debug('workitemsSourceQuery ' + settings.workitemsSourceQuery);
-    tl.debug('allWorkItemsSinceLastRelease ' + settings.allWorkItemsSinceLastRelease);
-    tl.debug('workItemType ' + settings.workItemType);
-    tl.debug('WorkItemState ' + settings.workItemState);
-    tl.debug('workItemCurrentState ' + settings.workItemCurrentState);
-    tl.debug('updateWorkItemKanbanLane ' + settings.workItemKanbanLane);
-    tl.debug('WorkItemKanbanState ' + settings.workItemKanbanState);
-    tl.debug('WorkItemDone ' + settings.workItemDone);
-    tl.debug('updateAssignedTo ' + settings.updateAssignedTo);
-    tl.debug('updateAssignedToWith ' + settings.updateAssignedToWith);
-    tl.debug('assignedTo ' + settings.assignedTo);
-    tl.debug('addTags ' + settings.addTags);
-    tl.debug('updateFields ' + settings.updateFields);
-    tl.debug('comment ' + settings.comment);
-    tl.debug('removeTags ' + settings.removeTags);
-    tl.debug('addPRTags ' + settings.addPRTags);
-    tl.debug('removePRTags ' + settings.removePRTags);
-    tl.debug('bypassRules ' + settings.bypassRules);
-    tl.debug('failTaskIfNoWorkItemsAvailable ' + settings.failTaskIfNoWorkItemsAvailable);
-
+    console.log('-------- Settings --------');
+    console.log('BuildId ' + settings.buildId);
+    console.log('ProjectId ' + settings.projectId);
+    console.log('RepositoryId ' + settings.repositoryId);
+    console.log('PullRequestId ' + settings.pullRequestId);
+    console.log('ReleaseId ' + settings.releaseId);
+    console.log('DefinitionId ' + settings.definitionId);
+    console.log('DefinitionEnvironmentId ' + settings.definitionEnvironmentId);
+    console.log('requestedFor ' + settings.requestedFor);
+    console.log('workitemsSource ' + settings.workitemsSource);
+    console.log('workitemLimit ' + settings.workitemLimit);
+    console.log('workitemsSourceQuery ' + settings.workitemsSourceQuery);
+    console.log('allWorkItemsSinceLastRelease ' + settings.allWorkItemsSinceLastRelease);
+    console.log('workItemType ' + settings.workItemType);
+    console.log('WorkItemState ' + settings.workItemState);
+    console.log('workItemCurrentState ' + settings.workItemCurrentState);
+    console.log('updateWorkItemKanbanLane ' + settings.workItemKanbanLane);
+    console.log('WorkItemKanbanState ' + settings.workItemKanbanState);
+    console.log('WorkItemDone ' + settings.workItemDone);
+    console.log('updateAssignedTo ' + settings.updateAssignedTo);
+    console.log('updateAssignedToWith ' + settings.updateAssignedToWith);
+    console.log('assignedTo ' + settings.assignedTo);
+    console.log('addTags ' + settings.addTags);
+    console.log('updateFields ' + settings.updateFields);
+    console.log('comment ' + settings.comment);
+    console.log('removeTags ' + settings.removeTags);
+    console.log('addPRTags ' + settings.addPRTags);
+    console.log('removePRTags ' + settings.removePRTags);
+    console.log('bypassRules ' + settings.bypassRules);
+    console.log('failTaskIfNoWorkItemsAvailable ' + settings.failTaskIfNoWorkItemsAvailable);
+    console.log('-------- Settings --------');
+    
     return settings;
 }
 
@@ -451,7 +453,7 @@ function addPatchOperation(path: any, value: any, document: any[], operation: Op
         value: value
     };
     document.push(patchOperation);
-    console.log('Patch: ' + patchOperation.path + ' ' + patchOperation.value);
+    console.log('Patch: ' + patchOperation.path + ' ' + (typeof patchOperation.value == 'object') ? JSON.stringify(patchOperation.value) : patchOperation.value);
 }
 
 main();
